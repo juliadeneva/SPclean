@@ -1,0 +1,424 @@
+myplot 
+	dev postencap p2030_53464_44546_0097_G68.62-04.85.N_0.wapp+.gp7clean.match.ps
+	sevenbeams p2030_53464_44546_0097_G68.62-04.85.N_0.wapp+.best2 p2030_53464_44546_0097_G68.62-04.85.N_1.wapp+.best2 p2030_53464_44546_0097_G68.62-04.85.N_2.wapp+.best2 p2030_53464_44546_0097_G68.62-04.85.N_3.wapp+.best2 p2030_53464_44546_0097_G68.62-04.85.N_4.wapp+.best2 p2030_53464_44546_0097_G68.62-04.85.N_5.wapp+.best2 p2030_53464_44546_0097_G68.62-04.85.N_6.wapp+.best2 dmlist_palfa_ctc 0.000064
+
+	hardcopy
+
+	
+
+sevenbeams 9 	#
+	# plots	page with DM vs t panels, one for each of the 7 beams on LHS
+	# and plots histograms and scatterplots for each beam along the RHS
+	# args 1-7 = outputfiles from single pulse analysis (matched filter)
+	# arg 8 = dmlist file used for dedispersion
+	# arg 9 = time resolution of samples
+
+	do n=1,7 {
+	  #define infile \$$n 
+	  #echo infile = $infile
+	  if($n==1) {define infile "$!1" data "$!infile" 
+	    read {ndm1 1 nsubband1 2 ns1 3 itime1 4 snr1 5 mean1 6 rms1 7}
+	  }
+	  if($n==2) {define infile "$!2" data "$!infile" 
+	    read {ndm2 1 nsubband2 2 ns2 3 itime2 4 snr2 5 mean2 6 rms2 7}
+	  }
+	  if($n==3) {define infile "$!3" data "$!infile" 
+	    read {ndm3 1 nsubband3 2 ns3 3 itime3 4 snr3 5 mean3 6 rms3 7}
+	  }
+	  if($n==4) {define infile "$!4" data "$!infile" 
+	    read {ndm4 1 nsubband4 2 ns4 3 itime4 4 snr4 5 mean4 6 rms4 7}
+	  }
+	  if($n==5) {define infile "$!5" data "$!infile" 
+	    read {ndm5 1 nsubband5 2 ns5 3 itime5 4 snr5 5 mean5 6 rms5 7}
+	  }
+	  if($n==6) {define infile "$!6" data "$!infile" 
+	    read {ndm6 1 nsubband6 2 ns6 3 itime6 4 snr6 5 mean6 6 rms6 7}
+	  }
+	  if($n==7) {define infile "$!7" data "$!infile" 
+	    read {ndm7 1 nsubband7 2 ns7 3 itime7 4 snr7 5 mean7 6 rms7 7}
+	  }
+	}
+
+	set itime = itime1 concat itime2 concat itime3 concat itime4 concat itime5 concat itime6 concat itime7 
+	vecminmax itime itimemin itimemax
+
+        # read dmfile to get actual dm values
+        define dmlist "$!8"
+        data "$!dmlist"
+        define ndmtotal read 1 1
+        lines 2 $($ndmtotal+1)
+        read {dmvalues 1}
+
+        # time interval
+        define dt $9
+
+        echo dt = $dt
+
+	# DO plots for each beam: DM-t plots, N vs. DM, DM vs. S/N: N vs. S/N, 
+	define expandbox 0.6
+	define doxlabels 0
+	
+	# Beam 0
+	echo calling ndm_vs_time
+	set ndm = ndm1 set itime = itime1 set snr = snr1 set ns = ns1
+	location 3500 14500 27000 31000 ndm_vs_time
+	ylabel Beam 0
+	relocate $($fx1+0.01*($fx2-$fx1)) $($fy2+0.10*($fy2-$fy1))
+	expand 0.6
+	putlabel 6 S/N > $snrplotmin":"
+
+	define dolabels 0
+	location 14500 18000 27000 31000 dmhistflip
+	relocate $(0.5*($fx1+$fx2)) $($fy2+0.1*($fy2-$fy1))
+	expand 0.6 putlabel 5 DMch vs N  
+	relocate $($fx1+0.7*($fx2-$fx1)) $($fy2-0.2*($fy2-$fy1))
+	expand 0.6 angle -90 putlabel 6 S/N > $snrcut 
+	angle 0
+	location 18000 21500 27000 31000 dm_vs_snr
+	relocate $(0.5*($fx1+$fx2)) $($fy2+0.1*($fy2-$fy1))
+	expand 0.6 putlabel 5 DMch vs S/N
+	location 21500 25000 27000 31000 dmdecode
+	relocate $(0.5*($fx1+$fx2)) $($fy2+0.1*($fy2-$fy1))
+	expand 0.6 putlabel 5 DMch vs DM
+	location 27000 31000 27000 31000 snrhist ylabel N
+	relocate $(0.5*($fx1+$fx2)) $($fy2+0.1*($fy2-$fy1))
+	expand 0.6 putlabel 5 N vs S/N
+
+	# Beam 1
+	echo calling ndm_vs_time
+	set ndm = ndm2 set itime = itime2 set snr = snr2 set ns = ns2
+	location 3500 14500 23000 27000 ndm_vs_time
+	ylabel Beam 1
+
+	define dolabels 0
+	location 14500 18000 23000 27000 dmhistflip
+	location 18000 21500 23000 27000 dm_vs_snr
+	location 21500 25000 23000 27000 dmdecode
+	location 27000 31000 23000 27000 snrhist ylabel N
+
+	# Beam 2
+	echo calling ndm_vs_time
+	set ndm = ndm3 set itime = itime3 set snr = snr3 set ns = ns3
+	location 3500 14500 19000 23000 ndm_vs_time
+	ylabel Beam 2
+
+	define dolabels 0
+	location 14500 18000 19000 23000 dmhistflip
+	location 18000 21500 19000 23000 dm_vs_snr
+	location 21500 25000 19000 23000 dmdecode
+	location 27000 31000 19000 23000 snrhist ylabel N
+
+	# Beam 3
+	echo calling ndm_vs_time
+	set ndm = ndm4 set itime = itime4 set snr = snr4 set ns = ns4
+	location 3500 14500 15000 19000 ndm_vs_time
+	ylabel Beam 3
+
+	define dolabels 0
+	location 14500 18000 15000 19000 dmhistflip
+	location 18000 21500 15000 19000 dm_vs_snr
+	location 21500 25000 15000 19000 dmdecode
+	location 27000 31000 15000 19000 snrhist ylabel N
+
+	# Beam 4
+	echo calling ndm_vs_time
+	set ndm = ndm5 set itime = itime5 set snr = snr5 set ns = ns5
+	location 3500 14500 11000 15000 ndm_vs_time
+	ylabel Beam 4
+
+	define dolabels 0
+	location 14500 18000 11000 15000 dmhistflip
+	location 18000 21500 11000 15000 dm_vs_snr
+	location 21500 25000 11000 15000 dmdecode
+	location 27000 31000 11000 15000 snrhist ylabel N
+
+	# Beam 5
+	echo calling ndm_vs_time
+	set ndm = ndm6 set itime = itime6 set snr = snr6 set ns = ns6
+	location 3500 14500 7000 11000 ndm_vs_time
+	ylabel Beam 5
+
+	define dolabels 0
+	location 14500 18000 7000 11000 dmhistflip
+	location 18000 21500 7000 11000 dm_vs_snr
+	location 21500 25000 7000 11000 dmdecode
+	location 27000 31000 7000 11000 snrhist ylabel N
+
+	# Beam 6
+	define doxlabels 1
+	echo calling ndm_vs_time
+	set ndm = ndm7 set itime = itime7 set snr = snr7 set ns = ns7
+	location 3500 14500 3000 7000   ndm_vs_time
+	ylabel Beam 6
+
+	define dolabels 0
+	location 14500 18000 3000 7000 dmhistflip box 1 0 0 0 xlabel N
+	location 18000 21500 3000 7000 dm_vs_snr box 1 0 0 0 xlabel S/N
+	location 21500 25000 3000 7000 dmdecode box 1 0 0 0 xlabel DM
+	location 27000 31000 3000 7000 snrhist ylabel N 
+	box 1 0 0 0 xlabel S/N
+	expand 1.1
+	location 3500 14500 3000 31000   
+	ylabel DM Channel
+	define infile "$!1"
+	toplabel "$!infile"
+
+
+singlebeam 3	# 
+	# plots page with plots for a single beam's results
+	# arg 1 = matched filtering output file from single pulse analysis
+	# arg 2 = dmlist file used for dedispersion
+	# arg 3 = time resolution of samples
+
+	# read single pulse results
+	define infile "$!1"
+	data "$!infile" 
+	read {ndm 1 nsubband 2 ns 3 itime 4 snr 5 mean 6 rms 7}
+	vecminmax itime itimemin itimemax
+
+	# read dmfile to get actual dm values
+	define dmlist "$!2"
+	data "$!dmlist"
+	define ndmtotal read 1 1
+	lines 2 $($ndmtotal+1)
+	read {dmvalues 1}
+
+	# time interval
+	define dt $3
+
+	echo dt = $dt
+
+	define doxlabels 1
+	define dolabels 1
+	expand 0.8
+	location 3500 9000 25000 31000 
+	echo calling snrhist
+	snrhist
+	location 10500 16000 25000 31000 
+	dmhist
+	location 18500 24000 25000 31000 
+	dm_vs_snr
+	location 24000 29500 25000 31000 
+	dmdecode
+	location 3500 29500 10500 22000 
+	define expandbox 0.8
+	ndm_vs_time
+	ylabel DM Channel
+	relocate $($fx1+0.01*($fx2-$fx1)) $($fy2+0.05*($fy2-$fy1))
+	expand 1.1
+	putlabel 6 S/N > $snrplotmin":"
+	toplabel "$!infile"
+
+
+snrhist	#
+	vecminmax snr snrmin snrmax
+	vecminmax itime itimemin itimemax
+	define dsnr (1)
+	set snrbins = $snrmin,$snrmax,$dsnr
+	set snrhist = histogram(snr:snrbins) 
+	set snrhistlg = lg(snrhist+1.e-9)
+	set snr_ns0 = snr if(ns==0)
+	set snr0hist = histogram(snr_ns0:snrbins)
+	set snr0histlg = lg(snr0hist+1.e-9)
+	vecminmax snrhistlg snrhistlgmin snrhistlgmax
+	#limits snrbins 0 $($snrhistlgmax*1.1)
+	limits 0 50 0 $($snrhistlgmax*1.1)
+	notation -2 2 -2 2
+	#if($snrmax<10) {ticksize 1 2 -10 10}
+	#if(10 <= $snrmax&&$snrmax<25) {ticksize 5 10 -1 10}
+	#if(25 <= $snrmax&&$snrmax<50) {ticksize 10 20 -1 10}
+	#if(50 <= $snrmax&&$snrmax<100) {ticksize 10 50 -1 10}
+	ticksize 10 20 -10 10
+	if ($dolabels==1) { box xlabel S/N 
+	  ylabel N 
+	}else{ box 0 2 0 0}
+	lw 2
+	histogram snrbins snrhistlg
+	lw 1
+	#histogram snrbins snr0histlg
+
+	# calculate and plot expected noise-only histogram
+	# see Cordes and McLaughlin 2003 ApJ, 596, 1142 
+	# which is 2.*ntrials*N(S/N, 1)
+	define ntrials ($ndmtotal * $itimemax) 
+	set nhatlg = lg(2.*$ntrials*$dsnr) - 0.5*lg(2.*PI) - lg(exp(1.))*(snrbins**2/2)
+	connect snrbins nhatlg
+
+dmhist	#
+	define snrcut 5.0
+        set ndm2use = ndm if(snr > $snrcut)
+	vecminmax ndm ndmmin ndmmax
+	set ndmbins = $ndmmin,$ndmmax,1
+	set ndmhist = histogram(ndm2use:ndmbins) 
+	set ndmhistlg = lg(ndmhist+0.1)
+	vecminmax ndmhistlg ndmhistlgmin ndmhistlgmax
+	if($ndmhistlgmin < 0) {define ndmhistlgmin 0}
+	limits 0 $($ndmtotal+1) -0.2 $($ndmhistlgmax+1.3)
+	notation -4 4 -2 2
+	if($ndmmax < 10) {ticksize 2 5 -10 10}
+	if(10 <= $ndmmax && $ndmmax < 50) {ticksize 5 20 -10 10}
+	if(50 <= $ndmmax && $ndmmax < 200) {ticksize 25 50 -10 10}
+	if(200 <= $ndmmax && $ndmmax < 500) {ticksize 100 200 -10 10}
+	if(500 <= $ndmmax && $ndmmax < 2000) {ticksize 250 500 -10 10}
+	if ($dolabels==1) { 
+	  box xlabel DM channel number
+	  relocate $($fx1+0.1*($fx2-$fx1)) $($fy2-0.1*($fy2-$fy1))
+	  putlabel 6 S/N > $snrcut
+	}else{ 
+  	  box 0 2 0 0
+	}
+	#ylabel N
+	histogram ndmbins ndmhistlg
+
+dmhistflip	# DMch is on the y axis
+	define snrcut 5.0
+        set ndm2use = ndm if(snr > $snrcut)
+	vecminmax ndm ndmmin ndmmax
+	set ndmbins = $ndmmin,$ndmmax,1
+	set ndmhist = histogram(ndm2use:ndmbins) 
+	set ndmhistlg = lg(ndmhist+0.1)
+	vecminmax ndmhistlg ndmhistlgmin ndmhistlgmax
+	if($ndmhistlgmin < 0) {define ndmhistlgmin 0}
+	#limits -0.2 $($ndmhistlgmax+1.3) 1 $(ndmbins[dimen(ndmbins)-1])  
+	#limits -0.5 $($ndmhistlgmax+1.3) 0 $($ndmtotal+1)
+	limits -0.5 3.5 0 $($ndmtotal+1)
+	notation -2 2 -4 4
+	if($ndmmax < 10) {ticksize -10 10 2 5 }
+	if(10 <= $ndmmax && $ndmmax < 50) {ticksize -10 10 5 20 }
+	if(50 <= $ndmmax && $ndmmax < 200) {ticksize -10 10 25 50 }
+	if(200 <= $ndmmax && $ndmmax < 500) {ticksize -10 10 100 200 }
+	if(500 <= $ndmmax && $ndmmax < 2000) {ticksize -10 10 250 500 }
+	if ($dolabels==1) { 
+	  box xlabel N
+	  relocate $($fx1+0.6*($fx2-$fx1)) $($fy2-0.1*($fy2-$fy1))
+	  putlabel 6 S/N > $snrcut
+	}else{ 
+  	  box 0 0 0 0
+	}
+	histogram ndmhistlg ndmbins 
+
+dm_vs_snr	#
+	define snrcut 5.0
+	#define snrcut 7
+	set snrplot = snr if(snr>$snrcut)
+	set ndmplot = ndm if(snr>$snrcut)
+	vecminmax snrplot snrmin snrmax
+	vecminmax ndmplot ndmmin ndmmax
+	#echo $snrmin $snrmax $ndmmin $ndmmax
+
+	limits $snrmin $snrmax 1 $ndmtotal
+	#limits -3 50 0 $($ndmtotal+1)
+
+        if($ndmmax < 10) {define ndmt1 2 define ndmt2 5}
+        if(10 <= $ndmmax && $ndmmax < 50) {define ndmt1 5 define ndmt2 20 }
+        if(50 <= $ndmmax && $ndmmax < 200) {define ndmt1 25 define ndmt2  50 }
+        if(200 <= $ndmmax && $ndmmax < 500) {define ndmt1 100 define ndmt2 200 }
+        if(500 <= $ndmmax && $ndmmax < 2000) {define ndmt1 250 define ndmt2 500 }
+	if($snrmax<10) {define nsnrt1 1 define nsnrt2 2}
+	if(10 <= $snrmax&&$snrmax<25) {define nsnrt1 5 define nsnrt2 10}
+	if(25 <= $snrmax&&$snrmax<50) {define nsnrt1 10 define nsnrt2 20}
+	if(50 <= $snrmax&&$snrmax<100) {define nsnrt1 10 define nsnrt2 50}
+	if(100 <= $snrmax&&$snrmax<1000) {define nsnrt1 50 define nsnrt2 100}
+	if(1000 <= $snrmax&&$snrmax<10000) {define nsnrt1 500 define nsnrt2 1000}
+
+	#define nsnrt1 5 define nsnrt2 5
+	ticksize $nsnrt1 $nsnrt2 $ndmt1 $ndmt2
+	notation -4 4 -4 4
+	if ($dolabels==1) { 
+		box 
+		xlabel S/N 
+		ylabel DM Channel 
+	}else{ box 0 0 0 0}
+	expand 0.1
+	lw 0.1
+	ptype 10 3
+	points snrplot ndmplot
+	expand 0.6
+	lw 1.001
+
+dmdecode	#
+	set ndmchannels = 1,$ndmtotal
+	vecminmax dmvalues dmvaluesmin dmvaluesmax
+	limits dmvalues 0 $($ndmtotal+1)
+	if($dmvaluesmax < 10) {define dmt1 2 define dmt2 5}
+	if(10<=$dmvaluesmax && $dmvaluesmax<50) {define dmt1 25 define dmt2 50}
+	if(50<=$dmvaluesmax && $dmvaluesmax<200) {define dmt1 25 define dmt2 50}
+	if(200<=$dmvaluesmax && $dmvaluesmax<500) {define dmt1 100 define dmt2 200}
+	if(500<=$dmvaluesmax && $dmvaluesmax<1000) {define dmt1 100 define dmt2 200}
+	if(1000<=$dmvaluesmax && $dmvaluesmax<2000) {define dmt1 250 define dmt2 500}
+	if(2000<=$dmvaluesmax) {define dmt1 1000 define dmt2 2000}
+
+        if($ndmmax < 10) {define ndmt1 2 define ndmt2 5}
+        if(10 <= $ndmmax && $ndmmax < 50) {define ndmt1 5 define ndmt2 20 }
+        if(50 <= $ndmmax && $ndmmax < 200) {define ndmt1 25 define ndmt2  50 }
+        if(200 <= $ndmmax && $ndmmax < 500) {define ndmt1 100 define ndmt2 200 }
+        if(500 <= $ndmmax && $ndmmax < 2000) {define ndmt1 250 define ndmt2 500 }
+
+	ticksize $dmt1 $dmt2 $ndmt1 $ndmt2
+	if ($dolabels==1) { box 1 0 0 0 
+		xlabel DM value  (pc cm-3) 
+	   }else{ box 0 0 0 0}
+	histogram dmvalues ndmchannels 
+
+ndm_vs_time
+	expand $expandbox
+	define snrplotmin 5.0
+	#define snrplotmin 7.5
+	set tplot = itime * $dt if(snr > $snrplotmin)
+	define tplotmin (-0.05*($itimemax-$itimemin)*$dt) 
+	define tplotmax (($itimemax+0.05*($itimemax-$itimemin))*$dt)
+	set ndmplot = ndm if(snr > $snrplotmin)
+	set snrplot = snr if(snr > $snrplotmin)
+	notation -4 4 -4 4
+	#limits tplot 0 $($ndmtotal+1)
+	limits $tplotmin $tplotmax  -1 $($ndmtotal+1)
+	
+	vecminmax ndmplot ndmmin ndmmax
+        if($ndmmax < 10) {define ndmt1 2 define ndmt2 5}
+        if(10 <= $ndmmax && $ndmmax < 50) {define ndmt1 5 define ndmt2 20 }
+        if(50 <= $ndmmax && $ndmmax < 200) {define ndmt1 25 define ndmt2  50 }
+        if(200 <= $ndmmax && $ndmmax < 500) {define ndmt1 100 define ndmt2 200 }
+        if(500 <= $ndmmax && $ndmmax < 2000) {define ndmt1 250 define ndmt2 500 }
+	if($tplotmax < 10) {define tt1 0.5 define tt2 1}
+	if(10 <= $tplotmax && $tplotmax < 50) {define tt1 2 define tt2 10}
+	if(50 <= $tplotmax && $tplotmax < 200) {define tt1 10 define tt2 20}
+	if(200 <= $tplotmax && $tplotmax < 500) {define tt1 50 define tt2 100}
+	if(500 <= $tplotmax && $tplotmax < 3000) {define tt1 250 define tt2 500}
+	if(3000 <= $tplotmax ) {define tt1 1000 define tt2 2000}
+
+	ticksize $tt1 $tt2 $ndmt1 $ndmt2 
+	if($doxlabels==1) {box xlabel Time (sec)
+	}else{
+	box 0 2 0 0
+	}
+	#ylabel DM Channel
+	if(dimen(snrplot) > 0){
+	 set expand_factor = 0.2 + 0.5*lg(snrplot)
+	 expand expand_factor
+	}
+	ptype 20 0
+	#ptype 1 1
+	points tplot ndmplot
+	expand $expandbox
+
+	define j $(dimen(tplot)-1)
+	ptype 20 0
+	
+
+        #while {$j >= 0} {
+        # define y $(ndmplot[$j] + 0.25)
+	# #set y = $(ndmplot[$j] + 0.25)
+        # define expand_factor (0.5 + (snrplot[$j]-$snrplotmin)*0.6)
+	# #echo $expand_factor
+	# if ($expand_factor > 3) {
+	#  define expand_factor 3 }
+        #  expand $expand_factor
+        #  define timevar $(tplot[$j])
+	#  #set timevar = $(tplot[$j])
+        #  relocate $timevar $y
+        #  dot
+	#  #points timevar y
+        #  define j ($j - 1)
+        # }
+    	#expand 1
+
