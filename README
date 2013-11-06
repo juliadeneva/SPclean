@@ -1,0 +1,15 @@
+C programs (production) and Matlab scripts (tests) for cleaning RFI from PALFA single pulse event lists produced by the two single-pulse search algorithms used by the Cornell code (matched filter and friends-of-friends). These can be adapted to use single pulse lists from other codes. 
+
+delays - max sample shift during dedispersion for the DM list used by the Cornell code to process PALFA data
+
+spclean.c, spclean.h - driver
+
+DFTclean.c - cleans out periodic radar blasts
+
+ANDclean.c - cleans out RFI that is detected in multiple ALFA beams simultaneously
+
+palfa-main.py - script to download single pulse event lists from the PALFA database at Cornell
+
+*.m - Matlab scripts that were tests for the algorithms in DFTclean.c and ANDclean.c
+
+*.sm - SuperMongo scripts for plotting single pulse events for a 7-beam pointings. 
